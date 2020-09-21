@@ -1,9 +1,27 @@
-#### Instructions
-1. Create `creds.json` with the details specified in `creds_template.json`
-2. Run the following commands to setup the environment:
+# Playlist Bot
+
+Discord Bot that automatically adds Spotify links to a playlist.
+
+## Setup
+
 ```bash
+cp example.env > .env
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
-3. Run the bot using `python -m playlist`
+
+Fill out the .env file with the correct credentials
+
+## Run
+
+```
+python -m playlist
+```
+or using Docker
+
+```
+docker-compose build
+docker-compose up
+```
+

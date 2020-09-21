@@ -1,29 +1,36 @@
+import os
 import csv
 import discord
 import logging
 import subprocess
 from discord.ext import commands
+from dotenv import load_dotenv
 
-from . import config
 from . import links
 from . import spotify
 
 REPO_LINK = "https://github.com/danielfspencer/playlist-bot"
 
+load_dotenv()
 logger = logging.getLogger('playlist')
-bot = discord.ext.commands.Bot(command_prefix=config.creds['discord']['command_prefix'])
+admin_role_id = int(os.getenv("ADMIN_ROLE_ID"))
+bot = discord.ext.commands.Bot(command_prefix=os.getenv("PREFIX"))
 
 tracks = []
 
 def start():
     logger.info("Starting bot...")
-    bot.run(config.creds['discord']['token'])
+    bot.run(os.getenv("DISCORD_TOKEN"))
 
 async def rebuild_playlist(ctx):
     await log_and_message(ctx, "Rebuild playlist...")
     discord_tracks = []
 
-    for channel_id in config.creds['discord']['channels']:
+    channels_env = os.getenv("CHANNELS")
+    channels = channels_env.split(",")
+
+    for channel_id in channels:
+        channel_id = int(channel_id)
         channel = bot.get_channel(channel_id)
         if channel is None:
             logger.warning(f"Skipping non-existent channel '{channel_id}'")
@@ -106,8 +113,6 @@ async def version(ctx):
     await ctx.send(message)
 
 @bot.command()
+@commands.has_role(admin_role_id)
 async def rebuild(ctx):
-    if ctx.author.id in config.creds['discord']['admin_ids']:
-        await rebuild_playlist(ctx)
-    else:
-        logger.warn(f'Unauthorised user \'{ctx.author.display_name}\' ({ctx.author.id}) tried to use rebuild command')
+    await rebuild_playlist(ctx)

@@ -1,14 +1,13 @@
+import os
 import logging
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-
-from . import config
 
 logger = logging.getLogger('playlist')
 SCOPE = 'playlist-modify-public'
 REDIRECT= 'https://localhost:8080'
 MAX_REQUEST_SIZE = 100
-PLAYLIST = config.creds['spotify']['playlist_id']
+PLAYLIST = os.getenv("PLAYLIST_ID")
 
 add_buffer = []
 remove_buffer = []
@@ -19,9 +18,9 @@ def init():
     instance = spotipy.Spotify(
         auth_manager=SpotifyOAuth(scope=SCOPE,
         redirect_uri=REDIRECT,
-        client_id=config.creds['spotify']['client_id'],
-        client_secret=config.creds['spotify']['client_secret'])
-        )
+        client_id=os.getenv("CLIENT_ID"),
+        client_secret=os.getenv("CLIENT_SECRET"))
+    )
 
 def add(item):
     if len(add_buffer) == MAX_REQUEST_SIZE:
